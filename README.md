@@ -56,7 +56,7 @@ mkdir -p ~/bin
 cd ~/bin
 
 # Download the build.sh script
-curl -o build.sh https://raw.githubusercontent.com/AutonomoDev/auto-rust-builder/main/build.sh
+curl -o build.sh https://raw.githubusercontent.com/AutonomoDev/auto-rust-builder/trunk/build.sh
 
 # Make the script executable
 chmod +x build.sh
