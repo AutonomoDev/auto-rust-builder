@@ -1,0 +1,69 @@
+#!/bin/bash
+# ==== ./auto-dev ====
+# Autonomo AI's Auto-Restart Development Script
+# This script automatically restarts autonomo-file-writer when it dies/is killed.
+#
+# Usage:
+#   ./auto-dev [arguments_to_pass_to_binary]
+#
+# Example:
+#   ./auto-dev --risky
+#   ./auto-dev /path/to/watch
+#
+# To exit, press CTRL+C.
+# ============================================================================
+
+BINARY_PATH="./target/debug/autonomo-file-writer"
+RESTART_DELAY=15
+
+# Check if binary exists
+if [ ! -f "$BINARY_PATH" ]; then
+    echo "❌ Binary not found at $BINARY_PATH"
+    echo "   Run './build.sh' first to build the project."
+    exit 1
+fi
+
+echo "============================================================================"
+echo "🔄 Autonomo AI's Auto-Restart Development Script"
+echo "============================================================================"
+echo "📦 Binary: $BINARY_PATH"
+echo "⏱️  Restart delay: ${RESTART_DELAY}s"
+echo "🛑 Press CTRL+C to stop"
+echo ""
+
+# Track if we should keep running
+KEEP_RUNNING=true
+
+# Handle CTRL+C gracefully
+trap "echo -e '\n🛑 Stopping auto-restart. Goodbye!'; KEEP_RUNNING=false; exit 0" SIGINT SIGTERM
+
+# Main loop
+while $KEEP_RUNNING; do
+    echo "🚀 Starting autonomo-file-writer..."
+    echo "   Command: $BINARY_PATH $@"
+    echo ""
+
+    # Run the binary with all passed arguments
+    $BINARY_PATH "$@"
+    EXIT_CODE=$?
+
+    if ! $KEEP_RUNNING; then
+        break
+    fi
+
+    echo ""
+    echo "⚠️  Process died with exit code: $EXIT_CODE"
+    echo "⏳ Waiting ${RESTART_DELAY} seconds before restart..."
+    echo ""
+
+    # Wait for restart delay (or until interrupted)
+    sleep $RESTART_DELAY || break
+
+    if ! $KEEP_RUNNING; then
+        break
+    fi
+
+    echo "============================================================================"
+done
+
+exit 0
